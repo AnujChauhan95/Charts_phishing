@@ -3,7 +3,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import pickle
-from sklearn.preprocessing import LabelEncoder, StandardScaler
+
 
 # Load trained model and preprocessors (mock for now)
 # In production, replace with: pickle.load(open("model.pkl", "rb"))
