@@ -19,8 +19,6 @@ cat_col = ['n_at', 'n_tilde', 'n_redirection']
 for col in cat_col:
     df[col] = df[col].fillna(df[col].median())
 
-st.subheader("Sample Data")
-st.dataframe(df.head())
 
 # Distribution of Phishing Labels
 st.subheader("Distribution of Phishing Labels")
