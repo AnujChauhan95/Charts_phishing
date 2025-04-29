@@ -1,3 +1,8 @@
+import streamlit as st
+import numpy as np
+import pandas as pd
+import pickle
+from sklearn.preprocessing import LabelEncoder, StandardScaler 
 import random
 
 # Move dropdown to left-center
