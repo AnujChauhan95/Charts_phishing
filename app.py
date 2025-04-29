@@ -1,70 +1,60 @@
+
 import streamlit as st
+import numpy as np
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
-import random
+import pickle
+from sklearn.preprocessing import LabelEncoder, StandardScaler
 
-st.set_page_config(page_title="Phishing Feature Analysis", layout="wide")
-st.title("Phishing Detection Data Exploration")
+# Load trained model and preprocessors (mock for now)
+# In production, replace with: pickle.load(open("model.pkl", "rb"))
 
-# Load data
-@st.cache_data
-def load_data():
-    return pd.read_csv("web-page-phishing.csv")
+st.title("Petroleum Revenue Prediction App")
 
-df = load_data()
+st.header("Enter Feature Values")
 
-# Fill missing values
-cat_col = ['n_at', 'n_tilde', 'n_redirection']
-for col in cat_col:
-    df[col] = df[col].fillna(df[col].median())
+# Input fields for each feature
+land_class = st.selectbox("Land Class", ["Federal", "Private", "State"])
+land_category = st.selectbox("Land Category", ["Onshore", "Offshore","Not Tied to a Lease"])
+state = st.selectbox("State", ["Texas", "Alaska", "California"])  # example states
+revenue_type = st.selectbox("Royalties", ["Royalty", "Bonus", "Rent","Inspection fees","Civil penalties", "Other revenue"])
+lease_type = st.selectbox("Mineral Lease Type", ["Competitive", "Non-Competitive"])
+commodity = st.selectbox("Commodity", ["Oil", "Gas", "Coal"])
+county = st.selectbox("County", ["County A", "County B", "County C"])  # example counties
+product = st.selectbox("Product", ["Crude Oil", "Natural Gas", "NGL"])
 
-# Distribution of Phishing Labels
-st.subheader("Distribution of Phishing Labels")
-fig1, ax1 = plt.subplots(figsize=(7, 4))
-sns.histplot(df['phishing'], legend=True, color='Red', stat='percent', ax=ax1)
-ax1.set_title('Distribution of Phishing Labels (0 = Legit, 1 = Phishing)', fontsize=14)
-ax1.set_xlabel('Phishing Label', fontsize=11)
-ax1.set_ylabel('Percentage', fontsize=11)
-st.pyplot(fig1)
+# Collect input in a DataFrame
+input_data = pd.DataFrame([{
+    "Land Class": land_class,
+    "Land Category": land_category,
+    "State": state,
+    "Revenue Type": revenue_type,
+    "Mineral Lease Type": lease_type,
+    "Commodity": commodity,
+    "County": county,
+    "Product": product
+}])
 
-# Define features and target
-X = df[['url_length', 'n_dots', 'n_hypens', 'n_underline', 'n_slash',
-        'n_questionmark', 'n_redirection']]
-Y = df['phishing']
+# Dummy prediction function for demo purposes
+def dummy_model_predict(df):
+    for col in df.columns:
+        le = LabelEncoder()
+        df[col] = le.fit_transform(df[col])
+    
+    scaler = StandardScaler()
+    df_scaled = scaler.fit_transform(df)
+    
+    # Dummy model
+    from sklearn.ensemble import RandomForestRegressor
+    model = RandomForestRegressor()
+    model.fit(df_scaled, [123456.78])
+    return model.predict(df_scaled)[0]
 
-# Centered dropdown selection
-st.subheader("📊 Interactive Column Visualization")
-with st.container():
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        selected_column = st.selectbox("Select a column to visualize:", X.columns.tolist())
+# Predict and display
+if st.button("Predict Revenue"):
+    prediction = dummy_model_predict(input_data)
+    st.success(f"Estimated Revenue: ${prediction:,.2f}")
 
-# Random color palette
-color_palette_all = random.choice(['Purples_d', 'Blues_d', 'Greens_d'])
-color_palette_phish = random.choice(['Reds_d', 'Oranges_d', 'pink'])
-
-# Plot for All Data
-st.markdown(f"### 🔍 Top 10 Values for '{selected_column}' (All Data)")
-top10_all = df[selected_column].value_counts().nlargest(10).sort_values()
-fig_all, ax_all = plt.subplots(figsize=(6, 4))
-sns.barplot(y=top10_all.index, x=top10_all.values, palette=color_palette_all, ax=ax_all)
-ax_all.set_title(f"Top 10 '{selected_column}' Values (All Data)", fontsize=14)
-ax_all.set_xlabel("Frequency", fontsize=11)
-ax_all.set_ylabel(selected_column, fontsize=11)
-for i, v in enumerate(top10_all.values):
-    ax_all.text(v + 0.5, i, str(v), color='black', va='center', fontsize=9)
-st.pyplot(fig_all)
-
-# Plot for Phishing Only
-st.markdown(f"### 🛑 Top 10 Values for '{selected_column}' (Phishing Only)")
-phishing_data = df[df['phishing'] == 1]
-top10_phishing = phishing_data[selected_column].value_counts().nlargest(10).sort_values()
-fig_phish, ax_phish = plt.subplots(figsize=(6, 4))
-sns.barplot(y=top10_phishing.index, x=top10_phishing.values, palette=color_palette_phish, ax=ax_phish)
-ax_phish.set_title(f"Top 10 '{selected_column}' Values (Phishing Only)", fontsize=14)
-ax_phish.set_xlabel("Frequency", fontsize=11)
-ax_phish.set_ylabel(selected_column, fontsize=11)
-for i, v in enumerate(top10_phishing.values):
-    ax_phish.text(v + 0.5, i, str(v), color='black', va='center', fontsize=9)
-st.pyplot(fig_phish)
+st.markdown("""
+<hr>
+<small>Developed with ❤️ using Streamlit</small>
+""", unsafe_allow_html=True)
