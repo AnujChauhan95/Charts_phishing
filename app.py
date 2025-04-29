@@ -13,7 +13,8 @@ import matplotlib.pyplot as plt
 # In[3]:
 
 
-df=pd.read_csv(r'C:\Users\USER\Desktop\cyber security\phishing\web-page-phishing.csv')
+df = pd.read_csv('web-page-phishing.csv')
+
 
 
 # In[5]:
