@@ -1,7 +1,26 @@
+
 import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+
+st.set_page_config(page_title="Phishing Feature Analysis", layout="wide")
+st.title("Phishing Detection Data Exploration")
+
+# Load data
+@st.cache_data
+def load_data():
+    return pd.read_csv("web-page-phishing.csv")
+
+df = load_data()
+
+# Fill missing values
+cat_col = ['n_at', 'n_tilde', 'n_redirection']
+for col in cat_col:
+    df[col] = df[col].fillna(df[col].median())
+
+st.subheader("Sample Data")
+st.dataframe(df.head())
 
 # Distribution of Phishing Labels
 st.subheader("Distribution of Phishing Labels")
@@ -10,7 +29,7 @@ sns.histplot(df['phishing'], legend=True, color='Red', stat='percent', ax=ax1)
 ax1.set_title('Distribution of Phishing Labels (0 = Legit, 1 = Phishing)')
 st.pyplot(fig1)
 
-# Define feature matrix X and target Y
+# Define features and target
 X = df[['url_length', 'n_dots', 'n_hypens', 'n_underline', 'n_slash',
         'n_questionmark', 'n_redirection']]
 Y = df['phishing']
@@ -41,4 +60,3 @@ ax_phish.set_title(f'Top 10 {selected_column} values (phishing = 1)')
 ax_phish.set_xlabel(selected_column)
 ax_phish.set_ylabel('Frequency')
 st.pyplot(fig_phish)
-
