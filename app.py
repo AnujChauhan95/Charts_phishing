@@ -1,12 +1,23 @@
-
 import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+# Distribution of Phishing Labels
+st.subheader("Distribution of Phishing Labels")
+fig1, ax1 = plt.subplots()
+sns.histplot(df['phishing'], legend=True, color='Red', stat='percent', ax=ax1)
+ax1.set_title('Distribution of Phishing Labels (0 = Legit, 1 = Phishing)')
+st.pyplot(fig1)
+
+# Define feature matrix X and target Y
+X = df[['url_length', 'n_dots', 'n_hypens', 'n_underline', 'n_slash',
+        'n_questionmark', 'n_redirection']]
+Y = df['phishing']
+
+# Interactive dropdown for column selection
 st.subheader("Interactive Column Visualization")
 
-# List of features to choose from
 columns = X.columns.tolist()
 selected_column = st.selectbox("Select a column to visualize:", columns)
 
@@ -30,3 +41,4 @@ ax_phish.set_title(f'Top 10 {selected_column} values (phishing = 1)')
 ax_phish.set_xlabel(selected_column)
 ax_phish.set_ylabel('Frequency')
 st.pyplot(fig_phish)
+
