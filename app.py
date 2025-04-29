@@ -1,60 +1,60 @@
 
 import streamlit as st
-import numpy as np
 import pandas as pd
-import pickle
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+st.set_page_config(page_title="Phishing Feature Analysis", layout="wide")
+st.title("Phishing Detection Data Exploration")
+
+# Load data
+@st.cache_data
+def load_data():
+    return pd.read_csv("web-page-phishing.csv")
+
+df = load_data()
+
+# Fill missing values
+cat_col = ['n_at', 'n_tilde', 'n_redirection']
+for col in cat_col:
+    df[col] = df[col].fillna(df[col].median())
 
 
-# Load trained model and preprocessors (mock for now)
-# In production, replace with: pickle.load(open("model.pkl", "rb"))
+# Distribution of Phishing Labels
+st.subheader("Distribution of Phishing Labels")
+fig1, ax1 = plt.subplots()
+sns.histplot(df['phishing'], legend=True, color='Red', stat='percent', ax=ax1)
+ax1.set_title('Distribution of Phishing Labels (0 = Legit, 1 = Phishing)')
+st.pyplot(fig1)
 
-st.title("Petroleum Revenue Prediction App")
+# Define features and target
+X = df[['url_length', 'n_dots', 'n_hypens', 'n_underline', 'n_slash',
+        'n_questionmark', 'n_redirection']]
+Y = df['phishing']
 
-st.header("Enter Feature Values")
+# Interactive dropdown for column selection
+st.subheader("Interactive Column Visualization")
 
-# Input fields for each feature
-land_class = st.selectbox("Land Class", ["Federal", "Private", "State"])
-land_category = st.selectbox("Land Category", ["Onshore", "Offshore","Not Tied to a Lease"])
-state = st.selectbox("State", ["Texas", "Alaska", "California"])  # example states
-revenue_type = st.selectbox("Royalties", ["Royalty", "Bonus", "Rent","Inspection fees","Civil penalties", "Other revenue"])
-lease_type = st.selectbox("Mineral Lease Type", ["Competitive", "Non-Competitive"])
-commodity = st.selectbox("Commodity", ["Oil", "Gas", "Coal"])
-county = st.selectbox("County", ["County A", "County B", "County C"])  # example counties
-product = st.selectbox("Product", ["Crude Oil", "Natural Gas", "NGL"])
+columns = X.columns.tolist()
+selected_column = st.selectbox("Select a column to visualize:", columns)
 
-# Collect input in a DataFrame
-input_data = pd.DataFrame([{
-    "Land Class": land_class,
-    "Land Category": land_category,
-    "State": state,
-    "Revenue Type": revenue_type,
-    "Mineral Lease Type": lease_type,
-    "Commodity": commodity,
-    "County": county,
-    "Product": product
-}])
+# Plot for all data
+st.markdown(f"### Top 10 Values for '{selected_column}' (All Data)")
+top10_all = df[selected_column].value_counts().nlargest(10).sort_index()
+fig_all, ax_all = plt.subplots(figsize=(6, 4))
+sns.barplot(x=top10_all.index, y=top10_all.values, color='purple', ax=ax_all)
+ax_all.set_title(f'Top 10 Frequency Values of {selected_column}')
+ax_all.set_xlabel(selected_column)
+ax_all.set_ylabel('Frequency')
+st.pyplot(fig_all)
 
-# Dummy prediction function for demo purposes
-def dummy_model_predict(df):
-    for col in df.columns:
-        le = LabelEncoder()
-        df[col] = le.fit_transform(df[col])
-    
-    scaler = StandardScaler()
-    df_scaled = scaler.fit_transform(df)
-    
-    # Dummy model
-    from sklearn.ensemble import RandomForestRegressor
-    model = RandomForestRegressor()
-    model.fit(df_scaled, [123456.78])
-    return model.predict(df_scaled)[0]
-
-# Predict and display
-if st.button("Predict Revenue"):
-    prediction = dummy_model_predict(input_data)
-    st.success(f"Estimated Revenue: ${prediction:,.2f}")
-
-st.markdown("""
-<hr>
-<small>Developed with ❤️ using Streamlit</small>
-""", unsafe_allow_html=True)
+# Plot for phishing = 1
+st.markdown(f"### Top 10 Values for '{selected_column}' (Phishing Only)")
+phishing_data = df[df['phishing'] == 1]
+top10_phishing = phishing_data[selected_column].value_counts().nlargest(10).sort_index()
+fig_phish, ax_phish = plt.subplots(figsize=(6, 4))
+sns.barplot(x=top10_phishing.index, y=top10_phishing.values, color='red', ax=ax_phish)
+ax_phish.set_title(f'Top 10 {selected_column} values (phishing = 1)')
+ax_phish.set_xlabel(selected_column)
+ax_phish.set_ylabel('Frequency')
+st.pyplot(fig_phish)
