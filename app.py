@@ -110,4 +110,4 @@ with eda_tab2:
 
 # Footer
 st.markdown("---")
-st.markdown("<p style='text-align: center;'>Made with ❤️ using Streamlit</p>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center;'>Made by Anuj Chauhan</p>", unsafe_allow_html=True)
