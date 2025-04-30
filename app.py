@@ -54,7 +54,7 @@ with eda_tab2:
 
     st.write("### Correlation Heatmap")
     fig, ax = plt.subplots(figsize=(5, 4))
-    sns.heatmap(df.corr(numeric_only=True), annot=True, fmt=".2f", cmap="coolwarm", ax=ax)
+    sns.heatmap(df.corr(numeric_only=True), fmt=".2f", cmap="coolwarm", ax=ax)
     st.pyplot(fig)
 
 # ---- Distribution Chart ----
