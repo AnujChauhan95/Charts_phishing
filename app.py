@@ -2,9 +2,12 @@ import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from streamlit_pandas_profiling import st_profile_report
+from ydata_profiling import ProfileReport
+import streamlit.components.v1 as components
+import tempfile
+import os
 
-# Page settings
+# Page config
 st.set_page_config(page_title="Phishing Feature Visualizer", layout="wide")
 st.markdown("<h1 style='text-align: center;'>🔍 Phishing Detection Data Exploration</h1>", unsafe_allow_html=True)
 st.markdown("---")
@@ -21,12 +24,17 @@ cat_col = ['n_at', 'n_tilde', 'n_redirection']
 for col in cat_col:
     df[col] = df[col].fillna(df[col].median())
 
-
+# --- Data Profiling Section ---
 st.markdown("## 🧪 Dataset Profiling Report (Exploratory Data Analysis)")
-
-if st.checkbox("Show full data profiling report"):
-    profile = ProfileReport(df, title="Phishing Dataset Profiling Report", explorative=True)
-    st_profile_report(profile)
+if st.checkbox("Show full profiling report"):
+    with st.spinner("Generating profiling report..."):
+        profile = ProfileReport(df, title="Phishing Dataset Profiling", explorative=True)
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as tmp_file:
+            profile.to_file(tmp_file.name)
+            with open(tmp_file.name, "r", encoding="utf-8") as f:
+                html_content = f.read()
+            components.html(html_content, height=1000, scrolling=True)
+        os.unlink(tmp_file.name)
 
 # ---- Distribution Chart ----
 st.subheader("🎯 Distribution of Phishing Labels")
