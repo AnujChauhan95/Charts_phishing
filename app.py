@@ -54,7 +54,7 @@ with eda_tab1:
 
     st.write("### Correlation Heatmap")
     fig_corr, ax_corr = plt.subplots(figsize=(5, 4))
-    sns.heatmap(df.corr(numeric_only=True), annot=True, fmt=".2f", cmap="coolwarm", ax=ax_corr)
+    sns.heatmap(df.corr(numeric_only=True), fmt=".2f", cmap="coolwarm", ax=ax_corr)
     st.pyplot(fig_corr)
 
 # --- Null Values & Visualization Tab ---
