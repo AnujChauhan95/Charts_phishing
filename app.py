@@ -36,7 +36,7 @@ color_map = {
 }
 
 # --- TABS ---
-eda_tab1, eda_tab2 = st.tabs(["📌 Dataset Summary", "📊 Null Values & Visualizations"])
+eda_tab1, eda_tab2 = st.tabs(["📌 Dataset Summary", "📊  Visualizations"])
 
 # --- Dataset Summary Tab ---
 with eda_tab1:
@@ -57,20 +57,8 @@ with eda_tab1:
     sns.heatmap(df.corr(numeric_only=True), fmt=".2f", cmap="coolwarm", ax=ax_corr)
     st.pyplot(fig_corr)
 
-# --- Null Values & Visualization Tab ---
-with eda_tab2:
-    st.write("### Missing Value Count")
-    missing = df.isnull().sum()
-    missing = missing[missing > 0]
-    if not missing.empty:
-        fig, ax = plt.subplots(figsize=(4, 2.5))
-        sns.barplot(x=missing.index, y=missing.values, color='orange', ax=ax)
-        ax.set_title("Missing Values per Column", fontsize=10)
-        ax.set_ylabel("Missing Count", fontsize=8)
-        ax.tick_params(axis='x', rotation=30)
-        st.pyplot(fig)
-    else:
-        st.success("✅ No missing values in the dataset.")
+# ---  Visualization Tab ---
+
 
     # ---- Distribution Chart ----
     st.subheader("🎯 Distribution of Phishing Labels")
