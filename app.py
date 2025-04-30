@@ -2,12 +2,8 @@ import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-from ydata_profiling import ProfileReport
-import streamlit.components.v1 as components
-import tempfile
-import os
 
-# Page config
+# Page setup
 st.set_page_config(page_title="Phishing Feature Visualizer", layout="wide")
 st.markdown("<h1 style='text-align: center;'>🔍 Phishing Detection Data Exploration</h1>", unsafe_allow_html=True)
 st.markdown("---")
@@ -24,17 +20,42 @@ cat_col = ['n_at', 'n_tilde', 'n_redirection']
 for col in cat_col:
     df[col] = df[col].fillna(df[col].median())
 
-# --- Data Profiling Section ---
-st.markdown("## 🧪 Dataset Profiling Report (Exploratory Data Analysis)")
-if st.checkbox("Show full profiling report"):
-    with st.spinner("Generating profiling report..."):
-        profile = ProfileReport(df, title="Phishing Dataset Profiling", explorative=True)
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".html") as tmp_file:
-            profile.to_file(tmp_file.name)
-            with open(tmp_file.name, "r", encoding="utf-8") as f:
-                html_content = f.read()
-            components.html(html_content, height=1000, scrolling=True)
-        os.unlink(tmp_file.name)
+# --- Custom EDA Section ---
+st.markdown("## 📌 Basic Dataset Overview")
+
+eda_tab1, eda_tab2 = st.tabs(["🔹 Dataset Summary", "🔸 Null Values & Correlation"])
+
+with eda_tab1:
+    st.write("### Dataset Preview")
+    st.dataframe(df.head())
+
+    st.write("### Dataset Shape")
+    st.write(f"Rows: {df.shape[0]}, Columns: {df.shape[1]}")
+
+    st.write("### Data Types")
+    st.write(df.dtypes)
+
+    st.write("### Descriptive Statistics")
+    st.dataframe(df.describe())
+
+with eda_tab2:
+    st.write("### Missing Value Count")
+    missing = df.isnull().sum()
+    missing = missing[missing > 0]
+    if not missing.empty:
+        fig, ax = plt.subplots(figsize=(4, 2.5))
+        sns.barplot(x=missing.index, y=missing.values, color='orange', ax=ax)
+        ax.set_title("Missing Values per Column", fontsize=10)
+        ax.set_ylabel("Missing Count", fontsize=8)
+        ax.tick_params(axis='x', rotation=30)
+        st.pyplot(fig)
+    else:
+        st.success("✅ No missing values in the dataset.")
+
+    st.write("### Correlation Heatmap")
+    fig, ax = plt.subplots(figsize=(5, 4))
+    sns.heatmap(df.corr(numeric_only=True), annot=True, fmt=".2f", cmap="coolwarm", ax=ax)
+    st.pyplot(fig)
 
 # ---- Distribution Chart ----
 st.subheader("🎯 Distribution of Phishing Labels")
