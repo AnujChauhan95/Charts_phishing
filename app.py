@@ -62,9 +62,9 @@ with eda_tab1:
 
     # ---- Distribution Chart ----
     with eda_tab2:
-         st.subheader("🎯 Distribution of Phishing Labels")
-         col1, col2 = st.columns([3, 1])
-         with col1:
+     st.subheader("🎯 Distribution of Phishing Labels")
+     col1, col2 = st.columns([3, 1])
+     with col1:
         fig1, ax1 = plt.subplots(figsize=(4, 2.5))
         sns.histplot(df['phishing'], color='crimson', stat='percent', ax=ax1)
         ax1.set_title('Phishing Label Distribution\n(0 = Legit, 1 = Phishing)', fontsize=10)
