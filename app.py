@@ -64,7 +64,7 @@ with eda_tab1:
     with eda_tab2:
      st.subheader("🎯 Distribution of Phishing Labels")
      col1, col2 = st.columns([3, 1])
-     with col1:
+      with col1:
         fig1, ax1 = plt.subplots(figsize=(4, 2.5))
         sns.histplot(df['phishing'], color='crimson', stat='percent', ax=ax1)
         ax1.set_title('Phishing Label Distribution\n(0 = Legit, 1 = Phishing)', fontsize=10)
@@ -72,7 +72,7 @@ with eda_tab1:
         ax1.set_ylabel('%', fontsize=8)
         ax1.tick_params(axis='both', labelsize=7)
         st.pyplot(fig1)
-    with col2:
+     with col2:
         phishing_counts = df['phishing'].value_counts(normalize=True) * 100
         st.metric(label="Legit (%)", value=f"{phishing_counts[0]:.2f}%")
         st.metric(label="Phishing (%)", value=f"{phishing_counts[1]:.2f}%")
